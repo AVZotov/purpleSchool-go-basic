@@ -1,36 +1,25 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
+const (
+	USDEUR = 0.88
+	USDRUB = 81.49
+	EURRUB = 92.84
+)
+const (
+	EURUSD = 1 / USDEUR
+	RUBUSD = 1 / USDRUB
+	RUBEUR = 1 / EURRUB
+)
+
 func userMenu() {
-	var initCurrency, targetCurrency string
+	initCurrency, targetCurrency := getCurrencies()
 	var amount float64
 	var err error
-	fmt.Println("Enter your currency (accepted currencies: USD, EUR, RUB)")
-	for {
-		initCurrency, err = getCurrency()
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		break
-	}
-	fmt.Println("Enter targeted currency (accepted currencies: USD, EUR, RUB)")
-	for {
-		targetCurrency, err = getCurrency()
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		if targetCurrency == initCurrency {
-			fmt.Println("Currencies matching. Nothing to convert, please try again.")
-			continue
-		}
-		break
-	}
+
 	fmt.Println("Enter the amount of money to convert:")
 	for {
 		amount, err = getAmount()
@@ -44,16 +33,55 @@ func userMenu() {
 		amount, initCurrency, calculate(initCurrency, targetCurrency, amount), targetCurrency)
 }
 
-func getCurrency() (string, error) {
+func getCurrencies() (string, string) {
+	var initCurrency, targetCurrency string
+	var err error
+	fmt.Println("Enter your currency (accepted currencies: USD, EUR, RUB)")
+	for {
+		initCurrency, err = scanUserInput()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if !checkCurrency(initCurrency) {
+			continue
+		}
+		break
+	}
+	fmt.Println("Enter targeted currency (accepted currencies: USD, EUR, RUB)")
+	for {
+		targetCurrency, err = scanUserInput()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if !checkCurrency(targetCurrency) {
+			continue
+		}
+		if targetCurrency == initCurrency {
+			fmt.Println("Currencies matching. Nothing to convert, please try again.")
+			continue
+		}
+		break
+	}
+	return initCurrency, targetCurrency
+}
+
+func scanUserInput() (string, error) {
 	var userInput string
 	_, err := fmt.Scan(&userInput)
 	if err != nil {
 		return "", err
 	}
-	if userInput != "USD" && userInput != "EUR" && userInput != "RUB" {
-		return "", errors.New("currency is not supported")
-	}
 	return userInput, nil
+}
+
+func checkCurrency(currency string) bool {
+	if currency != "USD" && currency != "EUR" && currency != "RUB" {
+		fmt.Println("Currency is not supported")
+		return false
+	}
+	return true
 }
 
 func getAmount() (float64, error) {
@@ -70,17 +98,17 @@ func getFX(initCurrency, targetCurrency string) float64 {
 
 	switch fx {
 	case "USDEUR":
-		return 0.88
-	case "EURUSD":
-		return 1.13
+		return USDEUR
 	case "USDRUB":
-		return 81.49
-	case "RUBUSD":
-		return 0.012271
+		return USDRUB
 	case "EURRUB":
-		return 92.84
+		return EURRUB
+	case "RUBUSD":
+		return RUBUSD
 	case "RUBEUR":
-		return 0.010772
+		return RUBEUR
+	case "EURUSD":
+		return EURUSD
 	default:
 		return 0
 	}
