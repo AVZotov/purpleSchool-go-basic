@@ -16,11 +16,11 @@ func menu() {
 
 	switch userInput {
 	case "SUM":
-		fmt.Printf("The sum is: %.2f", sum(&result))
+		fmt.Printf("The calculateSum is: %.2f", calculateSum(&result))
 	case "AVG":
-		fmt.Printf("The avg is: %.2f", avg(&result))
+		fmt.Printf("The calculateAverage is: %.2f", calculateAverage(&result))
 	case "MED":
-		fmt.Printf("The mediana is: %.2f", med(&result))
+		fmt.Printf("The mediana is: %.2f", calculateMedian(&result))
 	}
 }
 
@@ -87,7 +87,7 @@ func stringConverter(s string) ([]int, error) {
 	return result, nil
 }
 
-func avg(slice *[]int) float64 {
+func calculateAverage(slice *[]int) float64 {
 	var result float64
 
 	for _, value := range *slice {
@@ -97,7 +97,7 @@ func avg(slice *[]int) float64 {
 	return result / float64(len(*slice))
 }
 
-func sum(slice *[]int) float64 {
+func calculateSum(slice *[]int) float64 {
 	var result float64
 
 	for _, value := range *slice {
@@ -107,7 +107,7 @@ func sum(slice *[]int) float64 {
 	return result
 }
 
-func med(slice *[]int) float64 {
+func calculateMedian(slice *[]int) float64 {
 	sliceCopy := make([]int, len(*slice))
 	copy(sliceCopy, *slice)
 	slices.Sort(sliceCopy)

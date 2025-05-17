@@ -83,7 +83,11 @@ func getAmount() float64 {
 }
 
 func getFX(operation string, fx *map[string]float64) float64 {
-	fxValue, _ := (*fx)[operation]
+	fxValue, ok := (*fx)[operation]
+	if !ok {
+		fmt.Printf("operation %s is not supported!", operation)
+		return 0
+	}
 	return fxValue
 }
 
