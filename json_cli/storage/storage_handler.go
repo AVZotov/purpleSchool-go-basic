@@ -8,40 +8,49 @@ import (
 
 const fileName = "bins.json"
 
-func SaveToStorage(binList *bins.BinList) (bool, error) {
+func SaveToStorage(binList *bins.BinList) error {
 	data, err := json.Marshal(&binList)
 
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	file, err := os.Create(fileName)
 	defer file.Close()
 
 	if err != nil {
-		return false, err
+		return err
 	}
 	_, err = file.Write(data)
 
 	if err != nil {
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
-func LoadFromStorage(data []byte) (*bins.BinList, error) {
+func LoadFromStorage() (bins.BinList, error) {
 	file, err := os.ReadFile(fileName)
+	var binList bins.BinList
 
 	if err != nil {
-		return nil, err
+		return binList, err
 	}
 
-	var binList bins.BinList
 	err = json.Unmarshal(file, &binList)
 
 	if err != nil {
-		return nil, err
+		return binList, err
 	}
 
-	return &binList, nil
+	return binList, nil
+}
+
+func CreateEmptyStorage() error {
+	binList := bins.NewBinList()
+	err := SaveToStorage(binList)
+	if err != nil {
+		return err
+	}
+	return nil
 }
