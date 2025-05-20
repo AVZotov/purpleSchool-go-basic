@@ -12,8 +12,8 @@ type Bin struct {
 	Name      string    `json:"name"`
 }
 
-func NewBin(isPrivate bool, binName string) Bin {
-	return Bin{
+func NewBin(isPrivate bool, binName string) *Bin {
+	return &Bin{
 		Id:        uuid.NewString(),
 		Private:   isPrivate,
 		CreatedAt: time.Now(),
@@ -22,11 +22,15 @@ func NewBin(isPrivate bool, binName string) Bin {
 }
 
 type BinList struct {
-	Bins []Bin `json:"bins"`
+	Bins      []Bin     `json:"bins"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-func NewBinList() BinList {
-	return BinList{}
+func NewBinList() *BinList {
+	return &BinList{
+		Bins:      []Bin{},
+		CreatedAt: time.Now(),
+	}
 }
 
 func (b *BinList) Add(newBin *Bin) {
