@@ -9,43 +9,60 @@ import (
 	"os"
 )
 
-func LoadFromFile(filename string) bins.BinList {
+func toBytes(binList *bins.BinList) ([]byte, error) {
+	data, err := json.Marshal(&binList)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func toBinList(data []byte) (*bins.BinList, error) {
 	var binList bins.BinList
+	err := json.Unmarshal(data, &binList)
+	if err != nil {
+		return nil, err
+	}
+	return &binList, nil
+}
+
+func loadFromFile(filename string) []byte {
 	data, err := files.LoadFile(filename)
 	if err != nil {
 		fmt.Println(err)
-		err = storage.CreateEmptyStorage()
+		err = storage.CreateEmpty()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 		fmt.Println("Empty storage successfully created")
-		binList, err = storage.LoadFromStorage()
+		data, err = storage.Load()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		return binList
-	}
-	err = json.Unmarshal(data, &binList)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return data
 	}
 	fmt.Printf("Data successfully loaded from: %s\n", filename)
-	return binList
+	return data
 }
 
 func main() {
 
-	binList := LoadFromFile("someFile.json")
+	data := loadFromFile("SomeFile.json")
+	binList, err := toBinList(data)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-	binList.Add(bins.NewBin(true, "Alex"))
+	binList.Add(bins.NewBin(true, "Nikolay"))
 	binList.Add(bins.NewBin(false, "Sergey"))
 	binList.Add(bins.NewBin(true, "Andrey"))
 	binList.Add(bins.NewBin(false, "Vladimir"))
 
-	err := storage.SaveToStorage(&binList)
+	data, err = toBytes(binList)
+	err = storage.Save(data)
 	if err != nil {
 		return
 	}
