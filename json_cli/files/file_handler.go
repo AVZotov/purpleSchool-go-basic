@@ -22,8 +22,7 @@ func LoadFile(filename string) ([]byte, error) {
 }
 
 func isJsonExtension(fileName string) bool {
-	extension := filepath.Ext(fileName)
-	return extension == ".json"
+	return filepath.Ext(fileName) == ".json"
 }
 
 func isValidJson(data []byte) bool {
