@@ -1,26 +1,31 @@
 package files
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
-	"strings"
+	"path/filepath"
 )
 
 func LoadFile(filename string) ([]byte, error) {
-	if !isJson(filename) {
-		return nil, errors.New(filename + " is not a json")
+	if !isJsonExtension(filename) {
+		return nil, errors.New(filename + "not a json file extension")
 	}
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
+	if !isValidJson(data) {
+		return nil, errors.New(filename + "not a valid json file")
+	}
 	return data, nil
 }
 
-func isJson(fileName string) bool {
-	formatted := strings.Split(fileName, ".")
-	if len(formatted) < 2 {
-		return false
-	}
-	return strings.ToLower(formatted[len(formatted)-1]) == "json"
+func isJsonExtension(fileName string) bool {
+	extension := filepath.Ext(fileName)
+	return extension == ".json"
+}
+
+func isValidJson(data []byte) bool {
+	return json.Valid(data)
 }

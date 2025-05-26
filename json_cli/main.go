@@ -6,10 +6,10 @@ import (
 	"json_sli/bin"
 	"json_sli/files"
 	"json_sli/storage"
-	"os"
 )
 
-func toBytes(binList *bins.BinList) ([]byte, error) {
+func toBytes(binList bins.BinList) ([]byte, error) {
+	//data, err := json.MarshalIndent(&binList, "", "") //spaces between ":" separator added by Marshall formatter to pass json validation function.
 	data, err := json.Marshal(&binList)
 	if err != nil {
 		return nil, err
@@ -26,34 +26,40 @@ func toBinList(data []byte) (*bins.BinList, error) {
 	return &binList, nil
 }
 
-func loadFromFile(filename string) []byte {
+func loadFromFile(filename string) ([]byte, error) {
 	data, err := files.LoadFile(filename)
+	if err == nil {
+		fmt.Printf("Data successfully loaded from: %s\n", filename)
+		return data, nil
+	}
+	fmt.Printf("error loading file: %s\n", err)
+
+	err = storage.CreateEmpty()
+	if err != nil {
+		fmt.Printf("error creating empty file: %s\n", err)
+		return nil, err
+	}
+
+	fmt.Println("Empty storage successfully created")
+	data, err = storage.Load()
 	if err != nil {
 		fmt.Println(err)
-		err = storage.CreateEmpty()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		fmt.Println("Empty storage successfully created")
-		data, err = storage.Load()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		return data
+		return nil, err
 	}
-	fmt.Printf("Data successfully loaded from: %s\n", filename)
-	return data
+	return data, nil
 }
 
 func main() {
-
-	data := loadFromFile("SomeFile.json")
-	binList, err := toBinList(data)
+	var binList = bins.NewBinList()
+	data, err := loadFromFile("someFile.json")
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return
+	}
+
+	binList, err = toBinList(data)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	binList.Add(bins.NewBin(true, "Nikolay"))
@@ -61,9 +67,10 @@ func main() {
 	binList.Add(bins.NewBin(true, "Andrey"))
 	binList.Add(bins.NewBin(false, "Vladimir"))
 
-	data, err = toBytes(binList)
+	data, err = toBytes(*binList)
 	err = storage.Save(data)
 	if err != nil {
 		return
 	}
+	fmt.Println(string(data))
 }

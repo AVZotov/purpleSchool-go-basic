@@ -2,7 +2,7 @@ package storage
 
 import (
 	"encoding/json"
-	bins "json_sli/bin"
+	"json_sli/bin"
 	"os"
 )
 
