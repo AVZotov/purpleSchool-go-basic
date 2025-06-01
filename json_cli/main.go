@@ -3,19 +3,24 @@ package main
 import (
 	"fmt"
 	"json_sli/bin"
+	"json_sli/config"
+	"json_sli/encrypter"
+	"json_sli/files"
 	"json_sli/storage"
 )
 
 func main() {
-	var binList = bin.NewVault(storage.NewJsonDb("bins.json"), "BinList")
-	fmt.Println(binList)
+	fh := files.NewFileHandler("encryptedBins.json")
+	cfg := config.NewEnvConfig()
+	enc := encrypter.NewEncrypter(cfg)
+	db := storage.NewEncryptedJsonDb(fh, enc)
+	securedVault := bin.NewVault(db, "Secured Vault")
 
-	binList.Add(bin.NewBin(true, "Nikolay"))
-	binList.Add(bin.NewBin(false, "Sergey"))
-	binList.Add(bin.NewBin(true, "Andrey"))
-	binList.Add(bin.NewBin(false, "Vladimir"))
-	err := binList.Save()
-	if err != nil {
-		fmt.Println(err)
-	}
+	//securedVault.Add(bin.NewBin(true, "Nikolay"))
+
+	fmt.Println(securedVault.Vault)
+	//err := securedVault.Write()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
 }

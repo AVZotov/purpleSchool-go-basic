@@ -1,30 +1,45 @@
 package files
 
 import (
-	"encoding/json"
-	"errors"
 	"os"
-	"path/filepath"
 )
 
-func LoadFile(filename string) ([]byte, error) {
-	if !isJsonExtension(filename) {
-		return nil, errors.New(filename + "not a json file extension")
+type FileHandler struct {
+	Filename string
+}
+
+func NewFileHandler(filename string) *FileHandler {
+	return &FileHandler{
+		Filename: filename,
 	}
-	data, err := os.ReadFile(filename)
+}
+
+func (fh *FileHandler) LoadFile() ([]byte, error) {
+	data, err := os.ReadFile(fh.Filename)
 	if err != nil {
 		return nil, err
-	}
-	if !isValidJson(data) {
-		return nil, errors.New(filename + "not a valid json file")
 	}
 	return data, nil
 }
 
-func isJsonExtension(fileName string) bool {
-	return filepath.Ext(fileName) == ".json"
+func (fh *FileHandler) SaveFile(data []byte) error {
+	file, err := os.Create(fh.Filename)
+	if err != nil {
+		return err
+	}
+	defer func(file *os.File) {
+		err = file.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(file)
+	_, err = file.Write(data)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func isValidJson(data []byte) bool {
-	return json.Valid(data)
+func (fh *FileHandler) GetFilename() string {
+	return fh.Filename
 }

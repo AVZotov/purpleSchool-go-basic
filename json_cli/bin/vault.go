@@ -7,8 +7,8 @@ import (
 )
 
 type DataBase interface {
-	Save(data []byte) error
-	Load() ([]byte, error)
+	Write(data []byte) error
+	Read() ([]byte, error)
 }
 
 type Vault struct {
@@ -23,7 +23,7 @@ type VaultWithDb struct {
 }
 
 func NewVault(db DataBase, vaultName string) *VaultWithDb {
-	file, err := db.Load()
+	file, err := db.Read()
 	if err != nil {
 		fmt.Println(err)
 		return &VaultWithDb{
@@ -54,12 +54,12 @@ func NewVault(db DataBase, vaultName string) *VaultWithDb {
 	}
 }
 
-func (v *VaultWithDb) Save() error {
-	data, err := v.Vault.ToBytes()
+func (v *VaultWithDb) Write() error {
+	data, err := v.Vault.toBytes()
 	if err != nil {
 		return err
 	}
-	err = v.dataBase.Save(data)
+	err = v.dataBase.Write(data)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (v *VaultWithDb) Add(newBin *Bin) {
 	v.Vault.Bins = append(v.Vault.Bins, *newBin)
 }
 
-func (v *Vault) ToBytes() ([]byte, error) {
+func (v *Vault) toBytes() ([]byte, error) {
 	file, err := json.Marshal(v)
 	if err != nil {
 		return nil, err
