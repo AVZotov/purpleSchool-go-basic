@@ -26,6 +26,7 @@ func main() {
 			securedVault = bin.NewVault(db, "securedVault")
 		default:
 			fmt.Println(err)
+			return
 		}
 	}
 
