@@ -2,7 +2,6 @@ package bin
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -23,35 +22,31 @@ type VaultWithDb struct {
 }
 
 func NewVault(db DataBase, vaultName string) *VaultWithDb {
-	file, err := db.Read()
-	if err != nil {
-		fmt.Println(err)
-		return &VaultWithDb{
-			Vault: Vault{
-				Name:      vaultName,
-				Bins:      []Bin{},
-				CreatedAt: time.Now(),
-			},
-			dataBase: db,
-		}
-	}
-	var vault Vault
-	err = json.Unmarshal(file, &vault)
-	if err != nil {
-		fmt.Println(err)
-		return &VaultWithDb{
-			Vault: Vault{
-				Name:      vaultName,
-				Bins:      []Bin{},
-				CreatedAt: time.Now(),
-			},
-			dataBase: db,
-		}
-	}
 	return &VaultWithDb{
-		Vault:    vault,
+		Vault: Vault{
+			Name:      vaultName,
+			Bins:      []Bin{},
+			CreatedAt: time.Now(),
+		},
 		dataBase: db,
 	}
+}
+
+func LoadVault(db DataBase) (*VaultWithDb, error) {
+	file, err := db.Read()
+	if err != nil {
+		return nil, err
+	}
+	var vault *Vault
+	vault, err = toVault(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return &VaultWithDb{
+		Vault:    *vault,
+		dataBase: db,
+	}, nil
 }
 
 func (v *VaultWithDb) Write() error {
@@ -76,4 +71,13 @@ func (v *Vault) toBytes() ([]byte, error) {
 		return nil, err
 	}
 	return file, nil
+}
+
+func toVault(data []byte) (*Vault, error) {
+	var vault Vault
+	err := json.Unmarshal(data, &vault)
+	if err != nil {
+		return nil, err
+	}
+	return &vault, nil
 }
