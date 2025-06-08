@@ -11,17 +11,15 @@ import (
 )
 
 func menu() {
-	userInput := getOperation()
-	result := getIntSlice()
-
-	switch userInput {
-	case "SUM":
-		fmt.Printf("The calculateSum is: %.2f", calculateSum(&result))
-	case "AVG":
-		fmt.Printf("The calculateAverage is: %.2f", calculateAverage(&result))
-	case "MED":
-		fmt.Printf("The mediana is: %.2f", calculateMedian(&result))
+	selectedOperation := getOperation()
+	userSequence := getIntSlice()
+	myFunc := map[string]func(*[]int) float64{
+		"SUM": calculateSum,
+		"AVG": calculateAverage,
+		"MED": calculateMedian,
 	}
+	fmt.Printf("The calculated result is: %.2f",
+		myFunc[selectedOperation](&userSequence))
 }
 
 func scan() string {
@@ -93,17 +91,14 @@ func calculateAverage(slice *[]int) float64 {
 	for _, value := range *slice {
 		result += float64(value)
 	}
-
 	return result / float64(len(*slice))
 }
 
 func calculateSum(slice *[]int) float64 {
 	var result float64
-
 	for _, value := range *slice {
 		result += float64(value)
 	}
-
 	return result
 }
 
@@ -120,7 +115,6 @@ func calculateMedian(slice *[]int) float64 {
 		return float64((sliceCopy[len(sliceCopy)/2-1] +
 			sliceCopy[len(sliceCopy)/2]) / 2)
 	}
-
 	return float64(sliceCopy[len(sliceCopy)/2])
 }
 

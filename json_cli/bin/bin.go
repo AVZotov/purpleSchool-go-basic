@@ -1,4 +1,4 @@
-package bins
+package bin
 
 import (
 	"github.com/google/uuid"
@@ -19,20 +19,4 @@ func NewBin(isPrivate bool, binName string) *Bin {
 		CreatedAt: time.Now(),
 		Name:      binName,
 	}
-}
-
-type BinList struct {
-	Bins      []Bin     `json:"bins"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-func NewBinList() *BinList {
-	return &BinList{
-		Bins:      []Bin{},
-		CreatedAt: time.Now(),
-	}
-}
-
-func (b *BinList) Add(newBin *Bin) {
-	b.Bins = append(b.Bins, *newBin)
 }
