@@ -14,6 +14,26 @@ type Flags struct {
 	ID       string
 }
 
+func (flags *Flags) GetList() bool {
+	return flags.List
+}
+
+func (flags *Flags) GetMethod() string {
+	return flags.Method
+}
+
+func (flags *Flags) GetFilepath() string {
+	return flags.Filepath
+}
+
+func (flags *Flags) GetName() string {
+	return flags.BinName
+}
+
+func (flags *Flags) GetID() string {
+	return flags.ID
+}
+
 func GetFlags() (*Flags, error) {
 	flags := flagParser()
 	var err error
