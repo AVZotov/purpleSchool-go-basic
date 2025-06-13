@@ -6,6 +6,10 @@ import (
 	"fmt"
 )
 
+func httpRequest() []string {
+	return []string{"create", "get", "update", "delete"}
+}
+
 type Flags struct {
 	List     bool
 	Method   string
@@ -14,23 +18,23 @@ type Flags struct {
 	ID       string
 }
 
-func (flags *Flags) GetList() bool {
+func (flags *Flags) ReadAll() bool {
 	return flags.List
 }
 
-func (flags *Flags) GetMethod() string {
+func (flags *Flags) Request() string {
 	return flags.Method
 }
 
-func (flags *Flags) GetFilepath() string {
+func (flags *Flags) Path() string {
 	return flags.Filepath
 }
 
-func (flags *Flags) GetName() string {
+func (flags *Flags) Name() string {
 	return flags.BinName
 }
 
-func (flags *Flags) GetID() string {
+func (flags *Flags) Id() string {
 	return flags.ID
 }
 
@@ -38,10 +42,10 @@ func GetFlags() (*Flags, error) {
 	flags := flagParser()
 	var err error
 	httpMethodFunc := map[string]func(*Flags) error{
-		getHttpMethods()[0]: validateGetAndDeleteFlag,
-		getHttpMethods()[1]: validateGetAndDeleteFlag,
-		getHttpMethods()[2]: validateUpdateFlag,
-		getHttpMethods()[3]: validateCreateFlag,
+		httpRequest()[0]: validateCreateFlag,
+		httpRequest()[1]: validateGetAndDeleteFlag,
+		httpRequest()[2]: validateUpdateFlag,
+		httpRequest()[3]: validateGetAndDeleteFlag,
 	}
 
 	if flags.List {
@@ -103,7 +107,7 @@ func flagParser() *Flags {
 	flags := Flags{}
 
 	flag.BoolVar(&flags.List, "list", false, "lists all bins from the local storage")
-	for _, method := range getHttpMethods() {
+	for _, method := range httpRequest() {
 		flag.BoolFunc(method, fmt.Sprintf("http %q request. Must be only one flag of that type", method),
 			func(s string) error {
 				if flags.Method != "" {
@@ -116,14 +120,10 @@ func flagParser() *Flags {
 				return nil
 			})
 	}
-	flag.StringVar(&flags.Filepath, "file", "", "path to the file to sent to cloud storage")
+	flag.StringVar(&flags.Filepath, "file", "", "path to file with bin stored")
 	flag.StringVar(&flags.BinName, "name", "", "name of the bin")
 	flag.StringVar(&flags.ID, "id", "", "id of the bin")
 
 	flag.Parse()
 	return &flags
-}
-
-func getHttpMethods() []string {
-	return []string{"delete", "get", "update", "create"}
 }

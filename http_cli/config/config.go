@@ -16,7 +16,7 @@ func NewEnvConfig() *Config {
 	}
 	xMasterKey := os.Getenv("X_MASTER_KEY")
 	if xMasterKey == "" {
-		panic("env KEY required")
+		panic("env X_MASTER_KEY required")
 	}
 	return &Config{
 		XMasterKey: xMasterKey,
