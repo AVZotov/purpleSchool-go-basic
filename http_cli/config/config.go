@@ -14,6 +14,8 @@ func NewEnvConfig() *Config {
 	if err != nil {
 		panic("error loading .env file")
 	}
+	//TODO: Why key's value in .env need escaping prior to special symbols like $ as it is just a string
+	//TODO: Check if single quotes works instead of escaping if value passed in .env with spec characters
 	xMasterKey := os.Getenv("X_MASTER_KEY")
 	if xMasterKey == "" {
 		panic("env X_MASTER_KEY required")
