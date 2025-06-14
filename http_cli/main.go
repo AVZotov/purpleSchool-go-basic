@@ -6,7 +6,6 @@ import (
 	"http_cli/api"
 	"http_cli/api/response"
 	"http_cli/config"
-	"http_cli/storage"
 	"io"
 )
 
@@ -23,25 +22,21 @@ func main() {
 		UserId: "12345",
 	}
 	data, _ := json.Marshal(postData)
-	ls := storage.NewBinList()
 	configs := config.NewEnvConfig()
-	client := api.NewClient(configs, ls)
-	resp, err := client.Create("test1", data)
+	client := api.NewClient(configs)
+	resp, err := client.Delete("6846078b8a456b7966ab05fc")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-
-	var createResponse response.CreateResponse
-	data, _ = io.ReadAll(resp.Body)
-	err = json.Unmarshal(data, &createResponse)
+	body := resp.Body
+	defer body.Close()
+	data, _ = io.ReadAll(body)
+	var resStr response.Response
+	err = json.Unmarshal(data, &resStr)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	defer resp.Body.Close()
-
-	fmt.Println(createResponse.Metadata.CreatedAt)
-	fmt.Println(createResponse.Metadata.Id)
-	fmt.Println(createResponse.Metadata.Name)
-	fmt.Println(createResponse.Metadata.Private)
+	fmt.Println(resStr.GetMessage())
+	fmt.Println(resStr.GetId())
 }
